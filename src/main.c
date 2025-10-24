@@ -106,14 +106,23 @@ void MarioCollision()
     for (int i = 0; i < movingLength; i++)
         if (IsCollision(mario, moving[i]))
         {
-            if ((mario.IsFly == TRUE) && (mario.vertSpeed > 0) && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5))
-            {
-                DeleteMoving(i);
+            if (moving[i].cType == 'o')
+			{
+				if ((mario.IsFly == TRUE) && (mario.vertSpeed > 0) && (mario.y + mario.height < moving[i].y + moving[i].height * 0.5))
+				{
+					DeleteMoving(i);
+					i--;
+					continue;
+				}
+				else
+					CreateLevel(level);
+			}
+			if (moving[i].cType == '$')
+			{
+				DeleteMoving(i);
 				i--;
 				continue;
-            }
-			else
-				CreateLevel(level);
+			}
         }
 }
 
@@ -218,10 +227,18 @@ void CreateLevel(int lvl)
 		InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
 		InitObject(GetNewBrick(), 50, 10, 5, 3, '?');
 		InitObject(GetNewBrick(), 60, 15, 40, 10, '#');
+		InitObject(GetNewBrick(), 60, 5, 10, 3, '-');
+		InitObject(GetNewBrick(), 70, 5, 5, 3, '?');
+		InitObject(GetNewBrick(), 75, 5, 5, 3, '-');
+		InitObject(GetNewBrick(), 80, 5, 5, 3, '?');
+		InitObject(GetNewBrick(), 85, 5, 10, 3, '-');
 		InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
 		InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
 		InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
 		InitObject(GetNewBrick(), 210, 15, 10, 10, '+');
+
+		InitObject(GetNewMoving(), 25, 10, 3, 2, 'o');
+		InitObject(GetNewMoving(), 80, 10, 3, 2, 'o');
 	}
 	
 	if (lvl == 2) {
