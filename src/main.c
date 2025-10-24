@@ -76,7 +76,7 @@ void VertMoveObject(TObject *obj)
 			(*obj).IsFly = FALSE;
 			if (brick[i].cType == '+') {
 				level++;
-				if (level > 2) level = 1;
+				if (level > 3) level = 1;
 				CreateLevel(level);
 				Sleep(1000);
 			}
@@ -197,6 +197,18 @@ void CreateLevel(int lvl)
 	
 	if (lvl == 1) {
 		brickLength = 0;
+		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
+		InitObject(GetNewBrick(), 30, 10, 5, 3, '?');
+		InitObject(GetNewBrick(), 50, 10, 5, 3, '?');
+		InitObject(GetNewBrick(), 60, 15, 40, 10, '#');
+		InitObject(GetNewBrick(), 100, 20, 20, 5, '#');
+		InitObject(GetNewBrick(), 120, 15, 10, 10, '#');
+		InitObject(GetNewBrick(), 150, 20, 40, 5, '#');
+		InitObject(GetNewBrick(), 210, 15, 10, 10, '+');
+	}
+	
+	if (lvl == 2) {
+		brickLength = 0;
 		brick = realloc(brick, sizeof(*brick) * brickLength);
 		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
 		InitObject(GetNewBrick(), 60, 15, 10, 10, '#');
@@ -214,7 +226,7 @@ void CreateLevel(int lvl)
 		InitObject(GetNewMoving(), 175, 10, 3, 2, 'o');
 	}
 	
-	if (lvl == 2)
+	if (lvl == 3)
 	{
 		brickLength = 0;
 		InitObject(GetNewBrick(), 20, 20, 40, 5, '#');
