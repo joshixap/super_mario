@@ -118,7 +118,7 @@ void CreateLevel()
 {
     InitObject(&mario, 39, 10, 3, 3);
     brickLength = 5;
-    brick = malloc(sizeof(TObject) * brickLength);
+    brick = realloc(brick, sizeof(*brick) * brickLength);
 	InitObject(brick+0, 20, 20, 40, 5);
 	InitObject(brick+1, 60, 15, 10, 10);
 	InitObject(brick+2, 80, 20, 20, 5);
@@ -138,6 +138,8 @@ int main()
 		if ((mario.IsFly == FALSE) && (GetKeyState(VK_SPACE) < 0)) mario.vertSpeed = -1;
 		if (GetKeyState('D') < 0) HorizonMoveMap(1);
 		if (GetKeyState('A') < 0) HorizonMoveMap(-1);
+		
+		if (mario.y > mapHeight) CreateLevel();
 		
 		VertMoveObject(&mario);
 		for (int i = 0; i < brickLength; i++)
