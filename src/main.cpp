@@ -1,7 +1,8 @@
+#include <math.h>
+#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
-#include <ncurses.h>
+#include <cstring>
 
 #define mapWidth 80
 #define mapHeight 25
@@ -65,8 +66,6 @@ void InitObject(TObject *obj, float xPos, float yPos, float oWidth, float oHeigh
 void CreateLevel(int lvl);
 void PlayerDead()
 {
-    //system("color 4F");
-    //napms(500);
     napms(500);
     CreateLevel(level);
 }
@@ -99,7 +98,6 @@ void VertMoveObject(TObject *obj)
                 level++;
                 if (level > maxLvl) level = 1;
 
-                //system("color 2F");
                 napms(500);
                 CreateLevel(level);
             }
@@ -238,7 +236,6 @@ void PutScoreOnMap()
 
 void CreateLevel(int lvl)
 {
-    //system("color 9F");
 
     brickLength = 0;
     brick = (TObject*) realloc(brick, 0);
@@ -309,6 +306,7 @@ int main()
     initscr();
     noecho();
     curs_set(0);
+	nodelay(stdscr, TRUE);
     getmaxyx(stdscr, rows, columns);
 
     CreateLevel(level);
