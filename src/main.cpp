@@ -8,6 +8,7 @@
 #define MAP_HEIGHT 25
 static const int SCORE_TEXT_LEN = 30;
 static const int ESC_KEY = 27;
+static const int MAX_LEVEL = 3;
 
 typedef struct GameObject {
 	float x, y;
@@ -22,14 +23,14 @@ void clear_map(char map[MAP_HEIGHT][MAP_WIDTH + 1]);
 void show_map(char map[MAP_HEIGHT][MAP_WIDTH + 1]);
 void set_object_pos(GameObject *obj, float x_pos, float y_pos);
 void init_object(GameObject *obj, float x_pos, float y_pos, float width, float height, char type);
-void player_dead(GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, int *level, const int *max_level, int *score);
-void vert_move_object(GameObject *obj, GameObject *mario, GameObject *bricks, int brick_count, GameObject *moving, int moving_count, GameObject **moving_ptr, int *moving_count_ptr, GameObject **bricks_ptr, int *brick_count_ptr, int *level, const int *max_level, int *score);
+void player_dead(GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, int *level, int *score);
+void vert_move_object(GameObject *obj, GameObject *mario, GameObject *bricks, int brick_count, GameObject *moving, int moving_count, GameObject **moving_ptr, int *moving_count_ptr, GameObject **bricks_ptr, int *brick_count_ptr, int *level, int *score);
 void delete_moving(int index, GameObject **moving, int *moving_count);
-void mario_collision(GameObject *mario, GameObject *bricks, int brick_count, GameObject **moving, int *moving_count, GameObject **bricks_ptr, int *brick_count_ptr, int *level, const int *max_level, int *score);
+void mario_collision(GameObject *mario, GameObject *bricks, int brick_count, GameObject **moving, int *moving_count, GameObject **bricks_ptr, int *brick_count_ptr, int *level, int *score);
 void horizon_move_object(GameObject *obj, GameObject *bricks, int brick_count);
 bool is_pos_in_map(int x, int y);
 void set_cursor(int x, int y);
-void create_level(int level, GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, const int *max_level, int *score);
+void create_level(int level, GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, int *score);
 void horizon_move_map(float dx, GameObject *mario, GameObject *bricks, int brick_count, GameObject *moving, int moving_count);
 bool is_collision(GameObject o1, GameObject o2);
 void put_object_on_map(char map[MAP_HEIGHT][MAP_WIDTH + 1], GameObject obj);
@@ -73,12 +74,12 @@ void init_object(GameObject *obj, float x_pos, float y_pos, float width, float h
 	obj->horiz_speed = 0.2f;
 }
 
-void player_dead(GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, int *level, const int *max_level, int *score) {
+void player_dead(GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, int *level, int *score) {
 	napms(500);
-	create_level(*level, mario, bricks, brick_count, moving, moving_count, max_level, score);
+	create_level(*level, mario, bricks, brick_count, moving, moving_count, score);
 }
 
-void vert_move_object(GameObject *obj, GameObject *mario, GameObject *bricks, int brick_count, GameObject *moving, int moving_count, GameObject **moving_ptr, int *moving_count_ptr, GameObject **bricks_ptr, int *brick_count_ptr, int *level, const int *max_level, int *score) {
+void vert_move_object(GameObject *obj, GameObject *mario, GameObject *bricks, int brick_count, GameObject *moving, int moving_count, GameObject **moving_ptr, int *moving_count_ptr, GameObject **bricks_ptr, int *brick_count_ptr, int *level, int *score) {
 	obj->is_fly = true;
 	obj->vert_speed += 0.05f;
 	set_object_pos(obj, obj->x, obj->y + obj->vert_speed);
@@ -100,11 +101,11 @@ void vert_move_object(GameObject *obj, GameObject *mario, GameObject *bricks, in
 
 			if (bricks[i].type == '+') {
 				(*level)++;
-				if (*level > *max_level) {
+				if (*level > MAX_LEVEL) {
 					*level = 1;
 				}
 				napms(500);
-				create_level(*level, mario, bricks_ptr, brick_count_ptr, moving_ptr, moving_count_ptr, max_level, score);
+				create_level(*level, mario, bricks_ptr, brick_count_ptr, moving_ptr, moving_count_ptr, score);
 			}
 			break;
 		}
@@ -117,7 +118,7 @@ void delete_moving(int index, GameObject **moving, int *moving_count) {
 	*moving = (GameObject*) realloc(*moving, sizeof(**moving) * (*moving_count));
 }
 
-void mario_collision(GameObject *mario, GameObject *bricks, int brick_count, GameObject **moving, int *moving_count, GameObject **bricks_ptr, int *brick_count_ptr, int *level, const int *max_level, int *score) {
+void mario_collision(GameObject *mario, GameObject *bricks, int brick_count, GameObject **moving, int *moving_count, GameObject **bricks_ptr, int *brick_count_ptr, int *level, int *score) {
 	for (int i = 0; i < *moving_count; ++i) {
 		if (is_collision(*mario, (*moving)[i])) {
 			if ((*moving)[i].type == 'o') {
@@ -127,7 +128,7 @@ void mario_collision(GameObject *mario, GameObject *bricks, int brick_count, Gam
 					i--;
 					continue;
 				} else {
-					player_dead(mario, bricks_ptr, brick_count_ptr, moving, moving_count, level, max_level, score);
+					player_dead(mario, bricks_ptr, brick_count_ptr, moving, moving_count, level, score);
 				}
 			}
 			if ((*moving)[i].type == '$') {
@@ -153,7 +154,7 @@ void horizon_move_object(GameObject *obj, GameObject *bricks, int brick_count) {
 
 	if (obj[0].type == 'o') {
 		GameObject tmp = *obj;
-		vert_move_object(&tmp, NULL, bricks, brick_count, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		vert_move_object(&tmp, NULL, bricks, brick_count, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL);
 
 		if (tmp.is_fly) {
 			obj[0].x -= obj[0].horiz_speed;
@@ -232,7 +233,7 @@ void put_score_on_map(char map[MAP_HEIGHT][MAP_WIDTH + 1], int score) {
 	}
 }
 
-void create_level(int level, GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, const int *max_level, int *score) {
+void create_level(int level, GameObject *mario, GameObject **bricks, int *brick_count, GameObject **moving, int *moving_count, int *score) {
 	*brick_count = 0;
 	*bricks = (GameObject*) realloc(*bricks, 0);
 	*moving_count = 0;
@@ -301,7 +302,6 @@ int main() {
 	GameObject *moving = NULL;
 	int moving_count = 0;
 	int level = 1;
-	const int max_level = 3;
 	int score = 0;
 
 	initscr();
@@ -310,7 +310,7 @@ int main() {
 	nodelay(stdscr, TRUE);
 	getmaxyx(stdscr, rows, columns);
 
-	create_level(level, &mario, &bricks, &brick_count, &moving, &moving_count, &max_level, &score);
+	create_level(level, &mario, &bricks, &brick_count, &moving, &moving_count, &score);
 
 	do {
 		clear_map(map);
@@ -326,17 +326,17 @@ int main() {
 		}
 
 		if (mario.y > MAP_HEIGHT) {
-			player_dead(&mario, &bricks, &brick_count, &moving, &moving_count, &level, &max_level, &score);
+			player_dead(&mario, &bricks, &brick_count, &moving, &moving_count, &level, &score);
 		}
 
-		vert_move_object(&mario, &mario, bricks, brick_count, moving, moving_count, &moving, &moving_count, &bricks, &brick_count, &level, &max_level, &score);
-		mario_collision(&mario, bricks, brick_count, &moving, &moving_count, &bricks, &brick_count, &level, &max_level, &score);
+		vert_move_object(&mario, &mario, bricks, brick_count, moving, moving_count, &moving, &moving_count, &bricks, &brick_count, &level, &score);
+		mario_collision(&mario, bricks, brick_count, &moving, &moving_count, &bricks, &brick_count, &level, &score);
 
 		for (int i = 0; i < brick_count; ++i) {
 			put_object_on_map(map, bricks[i]);
 		}
 		for (int i = 0; i < moving_count; ++i) {
-			vert_move_object(moving + i, &mario, bricks, brick_count, moving, moving_count, &moving, &moving_count, &bricks, &brick_count, &level, &max_level, &score);
+			vert_move_object(moving + i, &mario, bricks, brick_count, moving, moving_count, &moving, &moving_count, &bricks, &brick_count, &level, &score);
 			horizon_move_object(moving + i, bricks, brick_count);
 			if (moving[i].y > MAP_HEIGHT) {
 				delete_moving(i, &moving, &moving_count);
