@@ -18,16 +18,34 @@ typedef struct GameObject {
 
 char g_map[MAP_HEIGHT][MAP_WIDTH + 1];
 GameObject g_mario;
-
 GameObject *g_bricks = NULL;
 int g_brick_count;
-
 GameObject *g_moving = NULL;
 int g_moving_count;
-
 int g_level = 1;
 int g_score;
 int g_max_level;
+
+void clear_map();
+void show_map();
+void set_object_pos(GameObject *obj, float x_pos, float y_pos);
+void init_object(GameObject *obj, float x_pos, float y_pos, float width, float height, char type);
+void player_dead();
+void vert_move_object(GameObject *obj);
+void delete_moving(int index);
+void mario_collision();
+void horizon_move_object(GameObject *obj);
+bool is_pos_in_map(int x, int y);
+void set_cursor(int x, int y);
+void create_level(int level);
+void horizon_move_map(float dx);
+bool is_collision(GameObject o1, GameObject o2);
+void put_object_on_map(GameObject obj);
+void put_score_on_map();
+GameObject *get_new_brick();
+GameObject *get_new_moving();
+
+
 
 void clear_map() {
 	for (int i = 0; i < MAP_WIDTH; i++) {
@@ -65,16 +83,10 @@ void init_object(GameObject *obj, float x_pos, float y_pos, float width, float h
 	obj->horiz_speed = 0.2;
 }
 
-void create_level(int level);
-
 void player_dead() {
 	napms(500);
 	create_level(g_level);
 }
-
-bool is_collision(GameObject o1, GameObject o2);
-
-GameObject *get_new_moving();
 
 void vert_move_object(GameObject *obj) {
 	obj->is_fly = true;
